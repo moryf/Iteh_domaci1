@@ -1,6 +1,25 @@
 <?php
 require("povezivanje_baza.php");
+require("Modeli/korisnik.php");
+session_start();
+if (isset($_POST['emailin']) && isset($_POST['psw'])) {
+  $koremail = $_POST['emailin'];
+  $pass = $_POST['psw'];
 
+  $korisnik=new Korisnik(null,$koremail,$pass);
+
+  $response = Korisnik::logovanjeKorisnika($korisnik, $mysqli);
+
+  if ($response->num_rows == 1) {
+    echo "Ulogovali ste se";
+    $_SESSION['korisnik_id'] = $response->fetch_object()->id;
+    $korisnik->id=$_SESSION['user_id'];
+    header('Location: home.php');
+    exit();
+} else {
+    echo "Niste se ulogovali";
+}
+}
 
 ?>
 <!DOCTYPE html>
@@ -22,7 +41,7 @@ require("povezivanje_baza.php");
           <label for="psw" class="form-label">Password</label>
           <input type="password" class="form-control" name="psw" id="pswin" placeholder="Password">
         </div>
-        <button type="submit">Log in</button>
+        <button type="submit" name="submit">Log in</button>
     </form>
 
 </div>
